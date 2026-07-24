@@ -97,7 +97,7 @@ const INITIAL_TELEMETRY: GuardrailTelemetry = {
     secretLeakage: true,
     biasDetected: false,
   },
-  lastCheckedTimestamp: new Date().toISOString(),
+  lastCheckedTimestamp: '2026-07-24T12:00:00.000Z',
 };
 
 interface AetherState {

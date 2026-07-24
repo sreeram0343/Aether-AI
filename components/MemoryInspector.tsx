@@ -108,7 +108,7 @@ export const MemoryInspector: React.FC = () => {
                       Sim: {(item.similarityScore * 100).toFixed(0)}%
                     </span>
                   )}
-                  <span className="text-[10px] text-slate-500">{item.timestamp}</span>
+                  <span className="text-[10px] text-slate-500" suppressHydrationWarning>{item.timestamp}</span>
                   <button
                     onClick={() => handleCopy(item.id, `${item.key}: ${item.value}`)}
                     className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-white transition-opacity"

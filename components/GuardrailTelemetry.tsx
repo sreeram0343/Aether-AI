@@ -152,7 +152,7 @@ export const GuardrailTelemetry: React.FC = () => {
           <Clock className="h-3 w-3 text-cyan-400" />
           <span>Guardrail Overhead: {telemetry.latencyOverheadMs}ms</span>
         </span>
-        <span>Updated: {telemetry.lastCheckedTimestamp.split('T')[1]?.slice(0, 8) || 'Live'}</span>
+        <span suppressHydrationWarning>Updated: {telemetry.lastCheckedTimestamp.split('T')[1]?.slice(0, 8) || 'Live'}</span>
       </div>
     </div>
   );

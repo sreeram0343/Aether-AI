@@ -27,10 +27,9 @@ const MODEL_OPTIONS: { id: ModelOption; label: string; badge: string }[] = [
 
 export const Header: React.FC = () => {
   const {
+    pipelineState,
     selectedModel,
     setSelectedModel,
-    isRunning,
-    isPaused,
     startExecution,
     pauseExecution,
     stepExecution,
@@ -94,15 +93,7 @@ export const Header: React.FC = () => {
 
       {/* Center Execution Playback Controls */}
       <div className="flex items-center space-x-2 bg-slate-900/80 border border-slate-800 p-1 rounded-xl shadow-inner">
-        {!isRunning || isPaused ? (
-          <button
-            onClick={startExecution}
-            className="flex items-center space-x-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition-all shadow-md shadow-emerald-500/20 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
-          >
-            <Play className="h-3.5 w-3.5 fill-slate-950" />
-            <span>{isPaused ? 'Resume' : 'Run Pipeline'}</span>
-          </button>
-        ) : (
+        {pipelineState === 'streaming' || pipelineState === 'dispatching' ? (
           <button
             onClick={pauseExecution}
             className="flex items-center space-x-1.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 px-3 py-1.5 rounded-lg text-xs transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
@@ -110,11 +101,19 @@ export const Header: React.FC = () => {
             <Pause className="h-3.5 w-3.5 fill-amber-300" />
             <span>Pause</span>
           </button>
+        ) : (
+          <button
+            onClick={startExecution}
+            className="flex items-center space-x-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition-all shadow-md shadow-emerald-500/20 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+          >
+            <Play className="h-3.5 w-3.5 fill-slate-950" />
+            <span>{pipelineState === 'paused' ? 'Resume' : 'Run Pipeline'}</span>
+          </button>
         )}
 
         <button
           onClick={stepExecution}
-          disabled={isRunning && !isPaused}
+          disabled={pipelineState === 'streaming' || pipelineState === 'dispatching'}
           className="flex items-center space-x-1 text-slate-300 hover:text-white hover:bg-slate-800/80 disabled:opacity-40 disabled:cursor-not-allowed px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
           title="Execute Single LangGraph Step"
         >

@@ -21,9 +21,8 @@ import { Badge } from './primitives/Badge';
 
 export const StreamingExecutionBoard: React.FC = () => {
   const {
+    pipelineState,
     streamedMarkdown,
-    isRunning,
-    isCompleted,
     citations,
     setActiveCitation,
     tokenMetrics,
@@ -140,13 +139,24 @@ export const StreamingExecutionBoard: React.FC = () => {
             Real-Time Streaming Markdown Canvas
           </span>
 
-          {isRunning && (
+          {pipelineState === 'dispatching' && (
+            <Badge variant="info" size="sm" className="animate-pulse">
+              <Activity className="h-3 w-3 mr-1" />
+              DISPATCHING...
+            </Badge>
+          )}
+          {pipelineState === 'streaming' && (
             <Badge variant="info" size="sm" className="animate-pulse">
               <Activity className="h-3 w-3 mr-1" />
               STREAMING ({tokenMetrics.tokensPerSecond} t/s)
             </Badge>
           )}
-          {isCompleted && (
+          {pipelineState === 'paused' && (
+            <Badge variant="warning" size="sm">
+              PAUSED
+            </Badge>
+          )}
+          {pipelineState === 'complete' && (
             <Badge variant="success" size="sm">
               STREAM COMPLETE
             </Badge>
@@ -200,7 +210,7 @@ export const StreamingExecutionBoard: React.FC = () => {
       {/* Main Canvas Scroll Area */}
       <div ref={scrollRef} className="flex-1 p-6 overflow-y-auto font-sans scroll-smooth">
         {renderFormattedContent(streamedMarkdown)}
-        {isRunning && (
+        {(pipelineState === 'streaming' || pipelineState === 'dispatching') && (
           <div className="inline-block h-4 w-2 bg-cyan-400 animate-pulse ml-1 align-middle" />
         )}
       </div>

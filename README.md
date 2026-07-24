@@ -33,6 +33,34 @@ store/
 
 ---
 
+## ⚡ Centralized Pipeline State Machine
+
+Aether AI drives all UI panels (Header controls, DAG canvas badges, streaming canvas throughput meters, memory counts) from a single shared state machine (`PipelineState` in `store/useAetherStore.ts`):
+
+```
+         [ Dispatch Query ]
+   idle --------------------> dispatching
+    ^                             |
+    | (Reset)                     v (150ms tick)
+    |                         streaming 🚀
+    |                           |     ^
+    |                    (Pause)|     |(Resume)
+    |                           v     |
+    +------------------------ paused ⏸️
+    |                             
+ complete <-----------------------+
+ (Stream Finished)
+```
+
+### State Definitions:
+- `idle`: Initial state. Canvas shows awaiting prompt state; Header displays "Run Pipeline".
+- `dispatching`: Short initializing tick preparing multi-agent context; DAG badge displays `DISPATCHING...`.
+- `streaming`: Incremental token streaming active. Blinking cursor visible, throughput velocity counter live, DAG nodes active.
+- `paused`: Execution suspended. Primary button displays "Resume", Step button enabled.
+- `complete`: Synthesis finished. Header displays "Run Pipeline", Markdown canvas displays `STREAM COMPLETE` with Export action.
+
+---
+
 ## 📡 SSE Stream Engine & Backend API Contract
 
 Streaming events are managed via `lib/sseClient.ts`. The interface supports both live Server-Sent Events (SSE) from FastAPI/LangGraph and high-fidelity local simulation.

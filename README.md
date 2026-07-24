@@ -1,117 +1,91 @@
-# Aether AI — Enterprise Multi-Agent Research Platform
+# Aether AI - Enterprise Multi-Agent Research Platform
 
-**Aether AI** is an enterprise-grade control center and orchestration engine for complex, autonomous research workflows. Built to support research analysts, AI engineers, and compliance officers, Aether AI provides real-time observability, deep state inspection, and robust safety telemetry across multi-agent execution graphs.
-
----
-
-## Key Features
-
-* **Real-Time Graph Observability:** Stream live agent execution states, node transitions, and decision loops via Server-Sent Events (SSE).
-* **Dual-Layer Memory Inspection:** Inspect Short-Term Memory (STM / working context) and Long-Term Memory (LTM / vector, episodic, and semantic stores) in real time.
-* **Enterprise Guardrail Telemetry:** Monitor input/output validation, safety checks, structural schema enforcement, and policy compliance on every agent boundary.
-* **Model Evaluation & Benchmarking:** Track latency, token consumption, model variance, and accuracy across individual agent execution steps.
-* **Role-Tailored Interfaces:** Distinct dashboard views optimized for **Research Analysts** (task spawning & reports), **AI Engineers** (graph debugging & memory traces), and **Compliance Officers** (audit trails & safety metrics).
+Aether AI is an enterprise-grade Multi-Agent AI Orchestration Console built with **Next.js 14 (App Router)**, **TypeScript**, **Zustand**, **Tailwind CSS (Dark OLED Palette)**, **`@xyflow/react` (React Flow)**, and **KaTeX Math**.
 
 ---
 
-## System Architecture
+## 🏗️ Architecture & Component Hierarchy
 
 ```
-                       +-------------------------------+
-                       |   Aether AI Frontend UI       |
-                       |  (Control Center & SSE Hub)   |
-                       +---------------+---------------+
-                                       |
-                       +---------------+---------------+
-                       |  API Gateway & SSE Streamer   |
-                       +---------------+---------------+
-                                       |
-         +-----------------------------+-----------------------------+
-         |                             |                             |
-+--------v-------+            +--------v-------+            +--------v-------+
-|  Agent Graph   |            | Memory Engine  |            |  Guardrails &  |
-|  Orchestrator  |            |  (STM / LTM)   |            |   Telemetry    |
-+----------------+            +----------------+            +----------------+
-
+app/
+├── layout.tsx                  # Root Next.js layout (Fonts, Meta, Dark OLED styles)
+├── page.tsx                    # Main 3-column Dashboard layout
+└── globals.css                 # Tailwind CSS & KaTeX math stylesheet imports
+components/
+├── primitives/                 # Standardized Production UI Primitives
+│   ├── Card.tsx                # Modular Card suite (Header, Title, Content, Footer)
+│   ├── Badge.tsx               # Status & pill badge primitive
+│   ├── StatusDot.tsx           # Status indicator dot with pulse animation
+│   ├── MetricTile.tsx          # Standardized metric container with progress meters
+│   └── MemoryEntry.tsx         # Componentized memory drawer entry card
+├── Header.tsx                  # Top navigation bar (Model selector, TPS, controls)
+├── AgentGraphCanvas.tsx        # React Flow DAG visualizer for LangGraph agents
+├── CustomGraphNode.tsx         # Node component with latency timers & status dots
+├── StreamingExecutionBoard.tsx # Sub-50ms Markdown + KaTeX canvas with ARIA live region
+├── CitationModal.tsx           # Interactive citation detail popover
+├── GuardrailTelemetry.tsx      # AWS Bedrock safety telemetry panel
+└── MemoryInspector.tsx         # Dual-tab (STM/LTM) working memory drawer
+lib/
+└── sseClient.ts                # EventSource / SSE streaming client engine
+store/
+└── useAetherStore.ts           # Zustand global state manager
 ```
 
 ---
 
-## Core Workflows
+## 📡 SSE Stream Engine & Backend API Contract
 
-### 1. Research Task Lifecycle
+Streaming events are managed via `lib/sseClient.ts`. The interface supports both live Server-Sent Events (SSE) from FastAPI/LangGraph and high-fidelity local simulation.
 
-1. **Task Spawning:** Define research scope, target domains, tool constraints, and policy bounds.
-2. **Graph Execution:** The orchestrator dispatches work across specialized nodes (e.g., *Query Expansion*, *Literature Synthesis*, *Verification*, *Formatting*).
-3. **Live Streaming:** SSE pushes live execution frames to the control center without continuous polling.
-4. **Human-in-the-Loop (HITL):** Pause execution graph nodes for explicit approval or context adjustments.
-
-### 2. Memory & Guardrail Tracing
-
-* **STM:** Tracks active tool outputs, scratchpads, and active conversation contexts.
-* **LTM:** Surfaces vector similarity scores, retrieval provenance, and historical knowledge graphs.
-* **Guardrails:** Flags real-time violations (e.g., hallucination bounds, toxicity, schema mismatch, unauthorized data egress).
-
----
-
-## Getting Started
-
-### Prerequisites
-
-* **Node.js:** `v18.0.0` or higher
-* **Package Manager:** `pnpm` (recommended), `npm`, or `yarn`
-* **Aether AI Backend Service:** Running instance (for SSE endpoints and graph orchestration)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/your-org/aether-ai.git
-cd aether-ai
-
-# Install dependencies
-pnpm install
-
-# Copy environment template
-cp .env.example .env.local
-
-```
-
-### Environment Configuration
-
-Configure your `.env.local` file with the relevant API endpoints and streaming tokens:
-
+### Swapping to a Live Backend
+Set the environment variable in `.env.local`:
 ```env
-NEXT_PUBLIC_AETHER_API_URL=http://localhost:8000/api/v1
-NEXT_PUBLIC_SSE_STREAM_URL=http://localhost:8000/api/v1/stream
-NEXT_PUBLIC_ENABLE_COMPLIANCE_MODE=true
-
+NEXT_PUBLIC_AETHER_API_URL=https://api.aether.ai/v1/stream
 ```
 
-### Development Server
+### Server-Sent Event (SSE) Payload Schema
+The backend emits Server-Sent Events (`text/event-stream`) in JSON format:
 
-```bash
-pnpm dev
-
+```json
+{
+  "type": "node_chunk",
+  "nodeId": "writer",
+  "content": "Logical error probability $P_L \\approx A \\cdot (p / p_{th})^{\\frac{d+1}{2}}$",
+  "tokensAdded": 18,
+  "latencyMs": 42,
+  "timestamp": 1771960000
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to access the control center.
+#### Event Types:
+- `pipeline_start`: Triggered when query pipeline begins execution.
+- `node_start`: Signals agent node status update to `running`.
+- `node_chunk`: Streaming markdown text fragment with LaTeX or inline citations `[1]`.
+- `guardrail_check`: Emits telemetry updates (PII masking count, hallucination score).
+- `memory_write`: Writes key-value entries into Short-Term (STM) or Long-Term (LTM) memory.
+- `node_end`: Signals agent node status update to `completed`.
 
 ---
 
-## Deployment & Verification
+## ♿ Accessibility (a11y) Features
 
-```bash
-# Type check and build for production
-pnpm build
-
-# Start production build locally
-pnpm start
-
-```
+- **ARIA Live Regions**: `StreamingExecutionBoard.tsx` contains `aria-live="polite"` to ensure screen readers announce incoming research text without disrupting navigation.
+- **Focus Rings & Keyboard Navigation**: All buttons, model dropdowns, graph controls, and preset chips include explicit `focus-visible:ring-2 focus-visible:ring-cyan-400` styling.
+- **High-Contrast OLED Theme**: Strict contrast ratios adhering to WCAG AA dark mode guidelines using Slate 950/Zinc dark palettes.
 
 ---
 
-## Safety & Compliance
+## 🛠️ Local Development & Scripts
 
-> **Important:** All agent memory states and tool calls are audited against configured policy guardrails before execution. Audit logs are persisted with cryptographic hashes to ensure non-repudiation for enterprise governance.
+```bash
+# Install dependencies
+npm install
+
+# Run dev server
+npm run dev
+
+# Build production bundle
+npm run build
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the application.

@@ -4,7 +4,7 @@ Aether AI is an enterprise-grade Multi-Agent AI Orchestration Console built with
 
 ---
 
-## 🏗️ Architecture & Component Hierarchy
+##  Architecture & Component Hierarchy
 
 ```
 app/
@@ -33,7 +33,7 @@ store/
 
 ---
 
-## ⚡ Centralized Pipeline State Machine
+##  Centralized Pipeline State Machine
 
 Aether AI drives all UI panels (Header controls, DAG canvas badges, streaming canvas throughput meters, memory counts) from a single shared state machine (`PipelineState` in `store/useAetherStore.ts`):
 
@@ -42,11 +42,11 @@ Aether AI drives all UI panels (Header controls, DAG canvas badges, streaming ca
    idle --------------------> dispatching
     ^                             |
     | (Reset)                     v (150ms tick)
-    |                         streaming 🚀
+    |                         streaming 
     |                           |     ^
     |                    (Pause)|     |(Resume)
     |                           v     |
-    +------------------------ paused ⏸️
+    +------------------------ paused 
     |                             
  complete <-----------------------+
  (Stream Finished)
@@ -61,7 +61,7 @@ Aether AI drives all UI panels (Header controls, DAG canvas badges, streaming ca
 
 ---
 
-## 📡 SSE Stream Engine & Backend API Contract
+##  SSE Stream Engine & Backend API Contract
 
 Streaming events are managed via `lib/sseClient.ts`. The interface supports both live Server-Sent Events (SSE) from FastAPI/LangGraph and high-fidelity local simulation.
 
@@ -95,7 +95,7 @@ The backend emits Server-Sent Events (`text/event-stream`) in JSON format:
 
 ---
 
-## ♿ Accessibility (a11y) Features
+##  Accessibility (a11y) Features
 
 - **ARIA Live Regions**: `StreamingExecutionBoard.tsx` contains `aria-live="polite"` to ensure screen readers announce incoming research text without disrupting navigation.
 - **Focus Rings & Keyboard Navigation**: All buttons, model dropdowns, graph controls, and preset chips include explicit `focus-visible:ring-2 focus-visible:ring-cyan-400` styling.
@@ -103,7 +103,7 @@ The backend emits Server-Sent Events (`text/event-stream`) in JSON format:
 
 ---
 
-## 🛠️ Local Development & Scripts
+##  Local Development & Scripts
 
 ```bash
 # Install dependencies

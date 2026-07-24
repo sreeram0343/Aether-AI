@@ -7,13 +7,13 @@ import {
   FileText,
   ShieldCheck,
   Edit3,
-  CheckCircle2,
   Clock,
   Zap,
-  Activity,
   Layers,
 } from 'lucide-react';
 import { AgentNodeData } from '../types/aether';
+import { StatusDot } from './primitives/StatusDot';
+import { Badge } from './primitives/Badge';
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   'Search Agent': <Search className="h-4 w-4 text-cyan-400" />,
@@ -33,11 +33,13 @@ export const CustomGraphNode: React.FC<CustomNodeProps> = ({ data, selected }) =
 
   return (
     <div
-      className={`relative min-w-[240px] max-w-[260px] rounded-xl bg-slate-900/95 border backdrop-blur-md p-3.5 transition-all duration-300 shadow-xl ${
+      tabIndex={0}
+      aria-label={`${data.label} node, status: ${data.status}`}
+      className={`relative min-w-[240px] max-w-[260px] rounded-xl bg-slate-900/95 border backdrop-blur-md p-3.5 transition-all duration-300 shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
         selected
           ? 'ring-2 ring-cyan-500/80 border-cyan-400 shadow-cyan-500/20'
           : isRunning
-          ? 'border-cyan-400 ring-2 ring-cyan-500/40 shadow-cyan-500/30 animate-pulse'
+          ? 'border-cyan-400 ring-2 ring-cyan-500/40 shadow-cyan-500/30'
           : isCompleted
           ? 'border-emerald-500/60 shadow-emerald-950/20'
           : 'border-slate-800 hover:border-slate-700'
@@ -62,22 +64,11 @@ export const CustomGraphNode: React.FC<CustomNodeProps> = ({ data, selected }) =
           </div>
         </div>
 
-        {/* Status Indicator */}
-        <div>
-          {isRunning ? (
-            <span className="flex h-2.5 w-2.5 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
-            </span>
-          ) : isCompleted ? (
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-          ) : (
-            <span className="h-2 w-2 rounded-full bg-slate-700 block"></span>
-          )}
-        </div>
+        {/* Primitive Status Dot */}
+        <StatusDot status={data.status} size="md" />
       </div>
 
-      {/* Node Body / Description */}
+      {/* Node Description */}
       <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed mb-3">
         {data.description}
       </p>
@@ -97,12 +88,9 @@ export const CustomGraphNode: React.FC<CustomNodeProps> = ({ data, selected }) =
       {/* Memory Tags */}
       <div className="flex flex-wrap gap-1">
         {data.memoryTags.map((tag, i) => (
-          <span
-            key={i}
-            className="px-1.5 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-800/40 text-[9px] font-mono"
-          >
+          <Badge key={i} variant="purple" size="sm">
             #{tag}
-          </span>
+          </Badge>
         ))}
       </div>
 

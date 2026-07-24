@@ -37,7 +37,7 @@ export const AgentGraphCanvas: React.FC = () => {
     return nodes.map((node) => ({
       ...node,
       selected: node.id === selectedNodeId,
-    })) as Node[];
+    })) as unknown as Node[];
   }, [nodes, selectedNodeId]);
 
   const formattedEdges = useMemo(() => {

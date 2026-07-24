@@ -136,11 +136,12 @@ interface AetherState {
   toggleMemory: () => void;
   toggleGraphExpanded: () => void;
 
-  // Playback Controls
+  // Playback & Export Controls
   startExecution: () => void;
   pauseExecution: () => void;
   stepExecution: () => void;
   resetExecution: () => void;
+  downloadMarkdown: () => void;
 }
 
 // Timer ref inside store module for execution control
@@ -463,5 +464,19 @@ export const useAetherStore = create<AetherState>((set, get) => ({
         totalLatencyMs: 0,
       },
     });
+  },
+
+  downloadMarkdown: () => {
+    const { streamedMarkdown } = get();
+    if (!streamedMarkdown) return;
+    const blob = new Blob([streamedMarkdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Aether_Research_Synthesis_${Date.now()}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   },
 }));

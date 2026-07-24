@@ -8,6 +8,7 @@ import {
   ModelOption,
   TokenMetrics,
   AgentNodeStatus,
+  PipelineState,
 } from '../types/aether';
 
 const INITIAL_NODES: AgentNode[] = [
@@ -107,7 +108,9 @@ interface AetherState {
   prompt: string;
   setPrompt: (p: string) => void;
 
-  // Stream & Execution
+  // Stream & Execution State Machine
+  pipelineState: PipelineState;
+  setPipelineState: (state: PipelineState) => void;
   isRunning: boolean;
   isPaused: boolean;
   isCompleted: boolean;
@@ -253,6 +256,14 @@ export const useAetherStore = create<AetherState>((set, get) => ({
   prompt: 'Analyze Fault-Tolerant Surface Codes and compute threshold scaling for d=7 in sub-100ns regimes.',
   setPrompt: (prompt) => set({ prompt }),
 
+  pipelineState: 'idle' as PipelineState,
+  setPipelineState: (pipelineState) =>
+    set({
+      pipelineState,
+      isRunning: pipelineState === 'streaming' || pipelineState === 'dispatching',
+      isPaused: pipelineState === 'paused',
+      isCompleted: pipelineState === 'complete',
+    }),
   isRunning: false,
   isPaused: false,
   isCompleted: false,
@@ -319,24 +330,28 @@ export const useAetherStore = create<AetherState>((set, get) => ({
   toggleGraphExpanded: () => set((state) => ({ isGraphExpanded: !state.isGraphExpanded })),
 
   startExecution: () => {
-    const { isRunning, isPaused } = get();
-    if (isRunning && !isPaused) return;
+    const { pipelineState } = get();
+    if (pipelineState === 'streaming') return;
 
-    if (get().isCompleted || stepIndex >= SAMPLE_STEPS.length) {
+    if (pipelineState === 'complete' || stepIndex >= SAMPLE_STEPS.length) {
       get().resetExecution();
     }
 
-    set({ isRunning: true, isPaused: false });
+    set({ pipelineState: 'dispatching', isRunning: true, isPaused: false, isCompleted: false });
 
     if (executionTimer) clearInterval(executionTimer);
 
+    setTimeout(() => {
+      set({ pipelineState: 'streaming' });
+    }, 150);
+
     const runStep = () => {
-      const { isPaused, isRunning } = get();
-      if (isPaused || !isRunning) return;
+      const { pipelineState } = get();
+      if (pipelineState === 'paused') return;
 
       if (stepIndex >= SAMPLE_STEPS.length) {
         if (executionTimer) clearInterval(executionTimer);
-        set({ isRunning: false, isCompleted: true });
+        set({ pipelineState: 'complete', isRunning: false, isCompleted: true, isPaused: false });
         return;
       }
 
@@ -413,11 +428,11 @@ export const useAetherStore = create<AetherState>((set, get) => ({
 
   pauseExecution: () => {
     if (executionTimer) clearInterval(executionTimer);
-    set({ isPaused: true });
+    set({ pipelineState: 'paused', isPaused: true });
   },
 
   stepExecution: () => {
-    set({ isRunning: true, isPaused: true });
+    set({ pipelineState: 'paused', isRunning: true, isPaused: true });
     if (stepIndex < SAMPLE_STEPS.length) {
       const step = SAMPLE_STEPS[stepIndex];
       get().updateNodeStatus(step.nodeId, step.status, step.latency, step.tokens);
@@ -435,6 +450,7 @@ export const useAetherStore = create<AetherState>((set, get) => ({
     if (executionTimer) clearInterval(executionTimer);
     stepIndex = 0;
     set({
+      pipelineState: 'idle',
       isRunning: false,
       isPaused: false,
       isCompleted: false,

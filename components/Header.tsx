@@ -11,13 +11,12 @@ import {
   Activity,
   Cpu,
   Database,
-  BarChart3,
-  Layers,
   ChevronDown,
   Sparkles,
 } from 'lucide-react';
 import { useAetherStore } from '../store/useAetherStore';
 import { ModelOption } from '../types/aether';
+import { Badge } from './primitives/Badge';
 
 const MODEL_OPTIONS: { id: ModelOption; label: string; badge: string }[] = [
   { id: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet', badge: 'Fastest' },
@@ -32,7 +31,6 @@ export const Header: React.FC = () => {
     setSelectedModel,
     isRunning,
     isPaused,
-    isCompleted,
     startExecution,
     pauseExecution,
     stepExecution,
@@ -60,24 +58,25 @@ export const Header: React.FC = () => {
               <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-slate-100 via-cyan-100 to-indigo-300 bg-clip-text text-transparent">
                 AETHER<span className="text-cyan-400">.AI</span>
               </span>
-              <span className="px-1.5 py-0.5 text-[10px] font-mono font-semibold tracking-wider bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 rounded-md">
+              <Badge variant="info" size="sm">
                 v2.4-PROD
-              </span>
+              </Badge>
             </div>
             <p className="text-[11px] text-slate-400 font-mono flex items-center space-x-1">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping mr-1"></span>
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping mr-1" />
               <span>LangGraph Engine • Sub-50ms SSE</span>
             </p>
           </div>
         </div>
 
-        <div className="h-6 w-[1px] bg-slate-800 hidden md:block"></div>
+        <div className="h-6 w-[1px] bg-slate-800 hidden md:block" />
 
         {/* Model Selector Dropdown */}
         <div className="relative group hidden lg:block">
           <div className="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-lg px-3 py-1.5 cursor-pointer transition-colors">
             <Cpu className="h-4 w-4 text-cyan-400" />
             <select
+              aria-label="Select AI Model"
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value as ModelOption)}
               className="bg-transparent text-xs font-semibold text-slate-200 outline-none cursor-pointer pr-4 appearance-none"
@@ -98,7 +97,7 @@ export const Header: React.FC = () => {
         {!isRunning || isPaused ? (
           <button
             onClick={startExecution}
-            className="flex items-center space-x-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition-all shadow-md shadow-emerald-500/20 active:scale-95"
+            className="flex items-center space-x-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition-all shadow-md shadow-emerald-500/20 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
           >
             <Play className="h-3.5 w-3.5 fill-slate-950" />
             <span>{isPaused ? 'Resume' : 'Run Pipeline'}</span>
@@ -106,7 +105,7 @@ export const Header: React.FC = () => {
         ) : (
           <button
             onClick={pauseExecution}
-            className="flex items-center space-x-1.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 px-3 py-1.5 rounded-lg text-xs transition-all active:scale-95"
+            className="flex items-center space-x-1.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 px-3 py-1.5 rounded-lg text-xs transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
           >
             <Pause className="h-3.5 w-3.5 fill-amber-300" />
             <span>Pause</span>
@@ -116,7 +115,7 @@ export const Header: React.FC = () => {
         <button
           onClick={stepExecution}
           disabled={isRunning && !isPaused}
-          className="flex items-center space-x-1 text-slate-300 hover:text-white hover:bg-slate-800/80 disabled:opacity-40 disabled:cursor-not-allowed px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors"
+          className="flex items-center space-x-1 text-slate-300 hover:text-white hover:bg-slate-800/80 disabled:opacity-40 disabled:cursor-not-allowed px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
           title="Execute Single LangGraph Step"
         >
           <StepForward className="h-3.5 w-3.5 text-cyan-400" />
@@ -125,7 +124,7 @@ export const Header: React.FC = () => {
 
         <button
           onClick={resetExecution}
-          className="flex items-center space-x-1 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors"
+          className="flex items-center space-x-1 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
           title="Reset Graph State"
         >
           <RotateCcw className="h-3.5 w-3.5" />
@@ -142,13 +141,13 @@ export const Header: React.FC = () => {
             <span className="text-slate-400">TPS:</span>
             <span className="text-amber-300 font-bold">{tokenMetrics.tokensPerSecond}</span>
           </div>
-          <div className="h-3 w-[1px] bg-slate-800"></div>
+          <div className="h-3 w-[1px] bg-slate-800" />
           <div className="flex items-center space-x-1.5">
             <Activity className="h-3.5 w-3.5 text-indigo-400" />
             <span className="text-slate-400">Tokens:</span>
             <span className="text-indigo-200 font-semibold">{tokenMetrics.totalTokens.toLocaleString()}</span>
           </div>
-          <div className="h-3 w-[1px] bg-slate-800"></div>
+          <div className="h-3 w-[1px] bg-slate-800" />
           <div className="flex items-center space-x-1.5">
             <span className="text-slate-400">Latency:</span>
             <span className="text-emerald-400">{tokenMetrics.totalLatencyMs}ms</span>
@@ -158,21 +157,18 @@ export const Header: React.FC = () => {
         {/* AWS Guardrail Live Badge */}
         <div
           onClick={toggleGuardrail}
-          className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg border text-xs font-mono font-medium cursor-pointer transition-all ${
-            telemetry.safetyStatus === 'PASSED'
-              ? 'bg-emerald-950/40 border-emerald-800/80 text-emerald-300 hover:bg-emerald-900/50'
-              : 'bg-amber-950/40 border-amber-800/80 text-amber-300 hover:bg-amber-900/50'
-          }`}
+          className="flex items-center space-x-2 cursor-pointer"
         >
-          <ShieldCheck className="h-4 w-4 text-emerald-400" />
-          <span className="hidden sm:inline">AWS GUARDRAIL:</span>
-          <span className="font-bold tracking-wide">{telemetry.safetyStatus}</span>
+          <Badge variant={telemetry.safetyStatus === 'PASSED' ? 'success' : 'warning'}>
+            <ShieldCheck className="h-3.5 w-3.5 mr-1" />
+            AWS GUARDRAIL: {telemetry.safetyStatus}
+          </Badge>
         </div>
 
         {/* Memory Inspector Drawer Toggle */}
         <button
           onClick={toggleMemory}
-          className={`p-2 rounded-lg border transition-colors ${
+          className={`p-2 rounded-lg border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
             isMemoryOpen
               ? 'bg-indigo-950/70 border-indigo-700 text-indigo-300'
               : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'

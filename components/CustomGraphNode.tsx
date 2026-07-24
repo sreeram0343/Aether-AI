@@ -22,12 +22,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   'Writer Agent': <Edit3 className="h-4 w-4 text-purple-400" />,
 };
 
-interface CustomNodeProps {
-  data: AgentNodeData;
-  selected?: boolean;
-}
-
-export const CustomGraphNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
+export const CustomGraphNode: React.FC<any> = ({ data, selected }) => {
   const isRunning = data.status === 'running';
   const isCompleted = data.status === 'completed';
 
@@ -87,7 +82,7 @@ export const CustomGraphNode: React.FC<CustomNodeProps> = ({ data, selected }) =
 
       {/* Memory Tags */}
       <div className="flex flex-wrap gap-1">
-        {data.memoryTags.map((tag, i) => (
+        {data.memoryTags.map((tag: string, i: number) => (
           <Badge key={i} variant="purple" size="sm">
             #{tag}
           </Badge>

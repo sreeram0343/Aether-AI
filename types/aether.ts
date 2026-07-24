@@ -1,3 +1,5 @@
+export type PipelineState = 'idle' | 'dispatching' | 'streaming' | 'paused' | 'complete' | 'error';
+
 export type AgentNodeStatus = 'idle' | 'running' | 'completed' | 'error' | 'waiting';
 
 export interface AgentNodeData {

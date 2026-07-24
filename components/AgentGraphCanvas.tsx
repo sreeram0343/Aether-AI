@@ -30,7 +30,7 @@ export const AgentGraphCanvas: React.FC = () => {
     setSelectedNodeId,
     isGraphExpanded,
     toggleGraphExpanded,
-    isRunning,
+    pipelineState,
   } = useAetherStore();
 
   const formattedNodes = useMemo(() => {
@@ -67,10 +67,15 @@ export const AgentGraphCanvas: React.FC = () => {
           <span className="text-xs font-bold tracking-tight text-slate-200">
             LangGraph Agent Execution DAG
           </span>
-          {isRunning && (
+          {(pipelineState === 'streaming' || pipelineState === 'dispatching') && (
             <span className="flex items-center space-x-1 font-mono text-[10px] text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded-md border border-cyan-800/60">
               <Activity className="h-3 w-3 animate-spin" />
-              <span>ACTIVE PIPELINE</span>
+              <span>{pipelineState === 'dispatching' ? 'DISPATCHING...' : 'ACTIVE PIPELINE'}</span>
+            </span>
+          )}
+          {pipelineState === 'paused' && (
+            <span className="flex items-center space-x-1 font-mono text-[10px] text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded-md border border-amber-800/60">
+              <span>PAUSED</span>
             </span>
           )}
         </div>
